@@ -40,7 +40,14 @@ namespace FluentAutomation.Tests
             //    .PreferedOperatingSystem().IsWindows()
             //    .PreferedScreenResolution().IsAny();
 
-            WbTstr.Bootstrap();
+            IWebDriverConfig webDriverConfig = new WebDriverConfig();
+
+            WbTstr.Default.Start();
+            WbTstr.Configure(webDriverConfig).Start();
+            WbTstr.Configure()
+                .EnableDebug()
+                .DisableDebug()
+                .Start();
 
             FluentSession.DisableStickySession();
             I.Open(SiteUrl);

@@ -14,8 +14,9 @@ namespace FluentAutomation
 {
     public class WbTstr : IWbTstr, IDisposable
     {
-        private static readonly object _mutex = string.Empty;
+        private static readonly object _mutex = new object();
         private static IWbTstr _instance;
+
         private readonly ConcurrentDictionary<string, object> _capabilities;
         private readonly string _uniqueIdentifier;
         private string _browserStackUsername;
@@ -47,6 +48,33 @@ namespace FluentAutomation
 
         /*-------------------------------------------------------------------*/
 
+        public static IWbTstr Default
+        {
+            get
+            {
+                return Instance;
+            }
+        }
+
+        private static IWbTstr Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (_mutex)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = CreateInstance();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
         internal Dictionary<string, object> Capabilities
         {
             get
@@ -58,26 +86,25 @@ namespace FluentAutomation
         internal Uri RemoteDriverUri { get; private set; }
 
         /*-------------------------------------------------------------------*/
-
+        
         public static IWbTstr Configure()
         {
-            if (_instance == null)
-            {
-                lock (_mutex)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = CreateInstance();
-                    }
-                }
-            }
+            // Create WebDriverConfig from configuration file
+            IWebDriverConfig config = new WebDriverConfig();
 
-            return _instance;
+            return Configure(config);
         }
 
-        public static IWbTstr Bootstrap()
+        public static IWbTstr Configure(IWebDriverConfig webDriverConfig)
         {
-            return Configure().BootstrapInstance();
+            return Instance.SetWebDriverConfig(webDriverConfig);
+        }
+
+        /*-------------------------------------------------------------------*/
+
+        public IWbTstr Start()
+        {
+            return BootstrapInstance();
         }
 
         public IWbTstr UseBrowserStackAsRemoteDriver()
@@ -354,7 +381,38 @@ namespace FluentAutomation
             return new WbTstrBrowserStackBrowser(this);
         }
 
-        public IWbTstr BootstrapInstance()
+        public IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig)
+        {
+            var localWebDriverConfig = webDriverConfig as ILocalWebDriverConfig;
+            if (localWebDriverConfig != null)
+            {
+                return SetLocalWebDriverConfig(localWebDriverConfig);
+            }
+
+            var remoteWebDriverConfig = webDriverConfig as IRemoteWebDriverConfig;
+            if (remoteWebDriverConfig != null)
+            {
+                return SetRemoteWebDriverConfig(remoteWebDriverConfig);
+            }
+
+            throw new InvalidOperationException("Not a support WebDriver config.");
+        }
+
+        private IWbTstr SetLocalWebDriverConfig(ILocalWebDriverConfig localWebDriverConfig)
+        {
+            throw new NotImplementedException();
+
+            return this;
+        }
+
+        private IWbTstr SetRemoteWebDriverConfig(IRemoteWebDriverConfig remoteWebDriverConfig)
+        {
+            throw new NotImplementedException();
+
+            return this;
+        }
+
+        private IWbTstr BootstrapInstance()
         {
             if (FluentSettings.Current.IsDryRun)
             {

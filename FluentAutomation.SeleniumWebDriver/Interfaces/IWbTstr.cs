@@ -197,9 +197,16 @@ namespace FluentAutomation.Interfaces
         IWbTstr UseRemoteWebDriver(string remoteWebUri);
 
         /// <summary>
-        /// Boostraps current WbTstr instance.
+        /// Starts current WbTstr instance.
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr BootstrapInstance();
+        IWbTstr Start();
+
+        /// <summary>
+        /// Specifies the web driver config
+        /// </summary>
+        /// <param name="webDriverConfig"></param>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig);
     }
 }

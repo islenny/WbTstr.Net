@@ -64,6 +64,10 @@
     <Compile Include="..\FluentAutomation\Properties\AssemblyGlobal.cs">
       <Link>Properties\AssemblyGlobal.cs</Link>
     </Compile>
+    <Compile Include="Interfaces\ILocalWebDriverConfig.cs" />
+    <Compile Include="Interfaces\IRemoteWebDriverConfig.cs" />
+    <Compile Include="WebDrivers\BrowserStackWebDriverConfig.cs" />
+    <Compile Include="WebDrivers\ChromeWebDriverConfig.cs" />
     <Compile Include="CommandProvider.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="CommandProviderList.cs" />
@@ -71,8 +75,12 @@
     <Compile Include="Interfaces\IWbTstrBrowserStackBrowser.cs" />
     <Compile Include="Interfaces\IWbTstrBrowserStackOperatingSystem.cs" />
     <Compile Include="Interfaces\IWbTstrBrowserStackScreenResolution.cs" />
+    <Compile Include="Interfaces\IWebDriverConfig.cs" />
     <Compile Include="MultiCommandProvider.cs" />
     <Compile Include="MultiAssertProvider.cs" />
+    <Compile Include="WebDrivers\LocalWebDriverConfig.cs" />
+    <Compile Include="WebDrivers\InternetExplorerWebDriverConfig.cs" />
+    <Compile Include="WebDrivers\PhantomWebDriverConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SeleniumWebDriver.cs" />
     <Compile Include="Sizzle.cs" />
@@ -80,6 +88,8 @@
     <Compile Include="WbTstrBrowserStackBrowser.cs" />
     <Compile Include="WbTstrBrowserStackOperatingSystem.cs" />
     <Compile Include="WbTstrBrowserStackScreenResolution.cs" />
+    <Compile Include="WebDriverConfig.cs" />
+    <Compile Include="WebDrivers\RemoteWebDriverConfig.cs" />
     <Compile Include="Wrappers\BrowserStackLocal.cs" />
     <Compile Include="Wrappers\EnhancedRemoteWebDriver.cs" />
     <Compile Include="Wrappers\IEDriver.cs" />
