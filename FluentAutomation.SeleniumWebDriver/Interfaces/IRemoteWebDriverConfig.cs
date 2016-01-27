@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FluentAutomation.Interfaces
 {
-    public interface IRemoteWebDriverConfig
+    public interface IRemoteWebDriverConfig : IWebDriverConfig
     {
     }
 }

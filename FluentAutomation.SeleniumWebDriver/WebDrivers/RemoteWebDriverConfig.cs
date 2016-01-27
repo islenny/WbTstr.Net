@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FluentAutomation.WebDrivers
 {
-    public class RemoteWebDriverConfig : IRemoteWebDriverConfig
+    public class RemoteWebDriverConfig : WebDriverConfig, IRemoteWebDriverConfig
     {
     }
 }

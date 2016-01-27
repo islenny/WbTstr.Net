@@ -6,12 +6,12 @@ using System.Text;
 
 namespace FluentAutomation.WebDrivers
 {
-    public class LocalWebDriverConfig : ILocalWebDriverConfig
+    public class LocalWebDriverConfig : WebDriverConfig, ILocalWebDriverConfig
     {
         public SeleniumWebDriver.Browser Browser
         {
             get;
-            protected set;
+            internal set;
         }
     }
 }

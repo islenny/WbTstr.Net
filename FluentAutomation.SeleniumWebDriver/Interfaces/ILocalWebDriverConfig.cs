@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FluentAutomation.Interfaces
 {
-    public interface ILocalWebDriverConfig
+    public interface ILocalWebDriverConfig : IWebDriverConfig
     {
         SeleniumWebDriver.Browser Browser { get; }
     }

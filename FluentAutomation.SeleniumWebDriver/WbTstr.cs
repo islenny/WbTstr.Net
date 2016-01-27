@@ -14,22 +14,8 @@ namespace FluentAutomation
 {
     public class WbTstr : IWbTstr, IDisposable
     {
-        private static readonly object _mutex = new object();
-        private static IWbTstr _instance;
-
         private readonly ConcurrentDictionary<string, object> _capabilities;
         private readonly string _uniqueIdentifier;
-        private string _browserStackUsername;
-        private string _browserStackPassword;
-        private bool _browserStackLocalEnabled;
-        private bool _browserStackUseProxy;
-        private string _browserStackLocalFolder;
-        private bool _browserStackOnlyAutomate;
-        private bool _browserStackForceLocal;
-        private string _browserStackProxyHost;
-        private int? _browserStackProxyPort;
-        private string _browserStackProxyUser;
-        private string _browserStackProxyPassword;
         private SeleniumWebDriver.Browser _localWebDriver;
 
         private bool _disposed;
@@ -46,34 +32,49 @@ namespace FluentAutomation
             Dispose(false);
         }
 
-        /*-------------------------------------------------------------------*/
+        /* Initialization ---------------------------------------------------*/
 
-        public static IWbTstr Default
+        private static readonly object _mutex = new object();
+        private static IWbTstr _instance;
+
+        public static IWbTstr Defaults()
         {
-            get
-            {
-                return Instance;
-            }
+            return CreateInstance(loadFromConfig: false);
         }
 
-        private static IWbTstr Instance
+        public static IWbTstr Configure()
         {
-            get
+            return CreateInstance(loadFromConfig: true);
+        }
+
+        public static IWbTstr Configure(IWebDriverConfig webDriverConfig)
+        {
+            return Defaults().SetWebDriverConfig(webDriverConfig);
+        }
+
+        private static IWbTstr CreateInstance(bool loadFromConfig = true)
+        {
+            if (_instance != null)
+            {
+                throw new InvalidOperationException("Can't reconfigure WbTstr after first initialization. Change settings manually.");
+            }
+
+            lock (_mutex)
             {
                 if (_instance == null)
                 {
-                    lock (_mutex)
+                    _instance = new WbTstr(Guid.NewGuid());
+                    if (loadFromConfig)
                     {
-                        if (_instance == null)
-                        {
-                            _instance = CreateInstance();
-                        }
+                        _instance.SetWebDriverConfig(WbTstrWebDriverConfigs.LoadFromConfigurationFile());
                     }
                 }
-
-                return _instance;
             }
+
+            return _instance;
         }
+
+        /* Properties -------------------------------------------------------*/
 
         internal Dictionary<string, object> Capabilities
         {
@@ -86,108 +87,10 @@ namespace FluentAutomation
         internal Uri RemoteDriverUri { get; private set; }
 
         /*-------------------------------------------------------------------*/
-        
-        public static IWbTstr Configure()
-        {
-            // Create WebDriverConfig from configuration file
-            IWebDriverConfig config = new WebDriverConfig();
-
-            return Configure(config);
-        }
-
-        public static IWbTstr Configure(IWebDriverConfig webDriverConfig)
-        {
-            return Instance.SetWebDriverConfig(webDriverConfig);
-        }
-
-        /*-------------------------------------------------------------------*/
 
         public IWbTstr Start()
         {
             return BootstrapInstance();
-        }
-
-        public IWbTstr UseBrowserStackAsRemoteDriver()
-        {
-            UseRemoteWebDriver("http://hub.browserstack.com/wd/hub/");
-
-            // Try to get browserstack username and password from configuration
-            if (_browserStackUsername == null && _browserStackPassword == null)
-            {
-                string username = ConfigReader.GetSetting("BrowserStackUsername");
-                string password = ConfigReader.GetSetting("BrowserStackPassword");
-
-                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
-                {
-                    SetBrowserStackCredentials(username, password);
-                }
-            }
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackCredentials(string username, string password)
-        {
-            if (string.IsNullOrEmpty(username)) throw new ArgumentException("username is null or empty");
-            if (string.IsNullOrEmpty(password)) throw new ArgumentException("password is null or empty");
-
-            // We might need this later, so make local reference
-            _browserStackUsername = username;
-            _browserStackPassword = password;
-
-            SetCapability("browserstack.user", username);
-            SetCapability("browserstack.key", password);
-            return this;
-        }
-
-        public IWbTstr EnableBrowserStackLocal()
-        {
-            _browserStackLocalEnabled = true;
-            SetCapability("browserstack.local", "true");
-            SetCapability("browserstack.localIdentifier", _uniqueIdentifier);
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackLocal()
-        {
-            _browserStackLocalEnabled = false;
-            SetCapability("browserstack.local", "false");
-            RemoveCapability("browserstack.localIdentifier");
-            return this;
-        }
-
-        public IWbTstr EnableBrowserStackProjectGrouping(string projectName)
-        {
-            SetCapability("project", projectName);
-
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackProjectGrouping()
-        {
-            RemoveCapability("project");
-
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackBuildIdentifier(string buildName)
-        {
-            SetCapability("build", buildName);
-
-            return this;
-        }
-
-        public IWbTstr EnableDebug()
-        {
-            FluentSettings.Current.InDebugMode = true;
-            SetCapability("browserstack.debug", "true");
-            return this;
-        }
-
-        public IWbTstr DisableDebug()
-        {
-            FluentSettings.Current.InDebugMode = false;
-            SetCapability("browserstack.debug", "false");
-            return this;
         }
 
         public IWbTstr EnableDryRun()
@@ -226,7 +129,7 @@ namespace FluentAutomation
 
         public IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser)
         {
-            DisableBrowserStackLocal();
+            //DisableBrowserStackLocal();
 
             RemoteDriverUri = null;
             _localWebDriver = browser;
@@ -240,131 +143,6 @@ namespace FluentAutomation
             RemoteDriverUri = new Uri(remoteWebDriver);
             return this;
         }
-
-
-        private static IWbTstr CreateInstance()
-        {
-            WbTstr wbTstr = new WbTstr(Guid.NewGuid());
-
-            bool? enableDebug = ConfigReader.GetSettingAsBoolean("EnableDebug");
-            if (enableDebug.HasValue && enableDebug.Value)
-            {
-                wbTstr.EnableDebug();
-            }
-
-            bool? enableDryRun = ConfigReader.GetSettingAsBoolean("EnableDryRun");
-            if (enableDryRun.HasValue && enableDryRun.Value)
-            {
-                wbTstr.EnableDryRun();
-            }
-
-            string useWebDriver = ConfigReader.GetSetting("UseWebDriver");
-            if (!String.IsNullOrWhiteSpace(useWebDriver))
-            {
-                SeleniumWebDriver.Browser browser;
-                if (Enum.TryParse(useWebDriver, true, out browser))
-                {
-                    wbTstr.UseWebDriver(browser);
-                }
-            }
-
-            string buildKey = ConfigReader.GetSetting("BuildResultKey");
-            if (!String.IsNullOrWhiteSpace(buildKey))
-            {
-                wbTstr.SetBrowserStackBuildIdentifier(buildKey);
-            }
-
-            bool? useBrowserStack = ConfigReader.GetSettingAsBoolean("UseBrowserStack");
-            if (useBrowserStack.HasValue && useBrowserStack.Value)
-            {
-                wbTstr.UseBrowserStackAsRemoteDriver();
-            }
-
-            bool? enableBrowserStackLocal = ConfigReader.GetSettingAsBoolean("EnableBrowserStackLocal");
-            if (enableBrowserStackLocal.HasValue && enableBrowserStackLocal.Value)
-            {
-                wbTstr.EnableBrowserStackLocal();
-            }
-
-            string browserStackProject = ConfigReader.GetSetting("BrowserStackProject");
-            if (!string.IsNullOrEmpty(browserStackProject))
-            {
-                wbTstr.EnableBrowserStackProjectGrouping(browserStackProject);
-            }
-
-            return wbTstr;
-        }
-
-        public IWbTstr SetBrowserStackLocalFolder(string path)
-        {
-            _browserStackLocalFolder = path;
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackLocalFolder()
-        {
-            _browserStackLocalFolder = null;
-            return this;
-        }
-
-        public IWbTstr EnableBrowserStackOnlyAutomate()
-        {
-            _browserStackOnlyAutomate = true;
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackOnlyAutomate()
-        {
-            _browserStackOnlyAutomate = false;
-            return this;
-        }
-
-        public IWbTstr EnableBrowserStackForceLocal()
-        {
-            _browserStackForceLocal = true;
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackForceLocal()
-        {
-            _browserStackForceLocal = false;
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackProxyHost(string host)
-        {
-            _browserStackUseProxy = true;
-            _browserStackProxyHost = host;
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackProxyPort(int port)
-        {
-            _browserStackUseProxy = true;
-            _browserStackProxyPort = port;
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackProxyUser(string user)
-        {
-            _browserStackUseProxy = true;
-            _browserStackProxyUser = user;
-            return this;
-        }
-
-        public IWbTstr SetBrowserStackProxyPassword(string password)
-        {
-            _browserStackUseProxy = true;
-            _browserStackProxyPassword = password;
-            return this;
-        }
-
-        public IWbTstr DisableBrowserStackProxy()
-        {
-            _browserStackUseProxy = false;
-            return this;
-        }
-
 
         public IWbTstrBrowserStackOperatingSystem PreferedBrowserStackOperatingSystem()
         {
@@ -395,20 +173,18 @@ namespace FluentAutomation
                 return SetRemoteWebDriverConfig(remoteWebDriverConfig);
             }
 
-            throw new InvalidOperationException("Not a support WebDriver config.");
+            throw new InvalidOperationException("Not a supported WebDriver config.");
         }
 
         private IWbTstr SetLocalWebDriverConfig(ILocalWebDriverConfig localWebDriverConfig)
         {
-            throw new NotImplementedException();
+            UseWebDriver(localWebDriverConfig.Browser);
 
             return this;
         }
 
         private IWbTstr SetRemoteWebDriverConfig(IRemoteWebDriverConfig remoteWebDriverConfig)
         {
-            throw new NotImplementedException();
-
             return this;
         }
 
@@ -420,20 +196,20 @@ namespace FluentAutomation
             }
             else if (RemoteDriverUri != null)
             {
-                if (_browserStackLocalEnabled)
-                {
-                    string arguments = BrowserStackLocal.Instance.BuildArguments(_browserStackPassword,
-                        _browserStackLocalFolder,
-                        _browserStackOnlyAutomate,
-                        _browserStackForceLocal,
-                        _browserStackUseProxy,
-                        _browserStackProxyHost,
-                        _browserStackProxyPort,
-                        _browserStackProxyUser,
-                        _browserStackProxyPassword);
+                //if (_browserStackLocalEnabled)
+                //{
+                //    string arguments = BrowserStackLocal.Instance.BuildArguments(_browserStackPassword,
+                //        _browserStackLocalFolder,
+                //        _browserStackOnlyAutomate,
+                //        _browserStackForceLocal,
+                //        _browserStackUseProxy,
+                //        _browserStackProxyHost,
+                //        _browserStackProxyPort,
+                //        _browserStackProxyUser,
+                //        _browserStackProxyPassword);
 
-                    BrowserStackLocal.Instance.Start(_uniqueIdentifier, arguments);
-                }
+                //    BrowserStackLocal.Instance.Start(_uniqueIdentifier, arguments);
+                //}
 
                 SeleniumWebDriver.Bootstrap(RemoteDriverUri, Capabilities);
             }
@@ -445,7 +221,7 @@ namespace FluentAutomation
             return this;
         }
 
-        /*-------------------------------------------------------------------*/
+        /* Destruction ------------------------------------------------------*/
 
         public void Dispose()
         {
@@ -469,7 +245,5 @@ namespace FluentAutomation
                 _disposed = true;
             }
         }
-
-        /*-------------------------------------------------------------------*/
     }
 }

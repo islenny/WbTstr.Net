@@ -40,14 +40,13 @@ namespace FluentAutomation.Tests
             //    .PreferedOperatingSystem().IsWindows()
             //    .PreferedScreenResolution().IsAny();
 
-            IWebDriverConfig webDriverConfig = new WebDriverConfig();
+            var phantom = WbTstrWebDriverConfigs.DefaultPhantomJsWebDriverConfig;
+            var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
+            var config = WbTstrWebDriverConfigs.LoadFromConfigurationFile();
 
-            WbTstr.Default.Start();
-            WbTstr.Configure(webDriverConfig).Start();
-            WbTstr.Configure()
-                .EnableDebug()
-                .DisableDebug()
-                .Start();
+            WbTstr.Defaults().Start();
+            //WbTstr.Configure().Start();
+            //WbTstr.Configure(phantom).Start();
 
             FluentSession.DisableStickySession();
             I.Open(SiteUrl);
