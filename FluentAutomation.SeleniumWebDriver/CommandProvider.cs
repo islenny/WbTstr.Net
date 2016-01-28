@@ -106,11 +106,12 @@ namespace FluentAutomation
                 try
                 {
                     // Get the remote WebDriver configuration
-                    WbTstr wbTstr = WbTstr.Configure() as WbTstr;
-                    if (wbTstr != null)
+                    IWbTstr wbTstr = WbTstr.Instance;
+                    IWebDriverConfig webDriverConfig = wbTstr.WebDriverConfig;
+                    if (webDriverConfig != null && webDriverConfig.WebDriverType != WebDriverType.Local)
                     {
-                        var capabilities = new DesiredCapabilities(wbTstr.Capabilities);
-                        var remoteDriverUri = wbTstr.RemoteDriverUri;
+                        var capabilities = new DesiredCapabilities(webDriverConfig.Capabilities);
+                        var remoteDriverUri = ((IRemoteWebDriverConfig)webDriverConfig).DriverUri;
 
                         // Create a new remote WebDriver
                         var policy = Policy.Handle<Exception>().WaitAndRetry(4, i => TimeSpan.FromSeconds(30));

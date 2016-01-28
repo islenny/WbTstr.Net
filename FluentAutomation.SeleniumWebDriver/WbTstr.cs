@@ -14,17 +14,12 @@ namespace FluentAutomation
 {
     public class WbTstr : IWbTstr, IDisposable
     {
-        private readonly ConcurrentDictionary<string, object> _capabilities;
-        private readonly string _uniqueIdentifier;
-        private SeleniumWebDriver.Browser _localWebDriver;
-
+        private static readonly object _mutex = new object();
+        private static IWbTstr _instance;
         private bool _disposed;
 
-        private WbTstr(Guid guid)
+        private WbTstr()
         {
-            _uniqueIdentifier = string.Format("{0}", guid);
-            _capabilities = new ConcurrentDictionary<string, object>();
-            _localWebDriver = SeleniumWebDriver.Browser.Chrome;
         }
 
         ~WbTstr()
@@ -32,19 +27,32 @@ namespace FluentAutomation
             Dispose(false);
         }
 
-        /* Initialization ---------------------------------------------------*/
+        /* Properties -------------------------------------------------------*/
 
-        private static readonly object _mutex = new object();
-        private static IWbTstr _instance;
+        internal static IWbTstr Instance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+        public IWebDriverConfig WebDriverConfig
+        {
+            get;
+            private set;
+        }
+
+        /* Initialization ---------------------------------------------------*/
 
         public static IWbTstr Defaults()
         {
-            return CreateInstance(loadFromConfig: false);
+            return CreateInstance(false);
         }
 
         public static IWbTstr Configure()
         {
-            return CreateInstance(loadFromConfig: true);
+            return CreateInstance();
         }
 
         public static IWbTstr Configure(IWebDriverConfig webDriverConfig)
@@ -56,14 +64,14 @@ namespace FluentAutomation
         {
             if (_instance != null)
             {
-                throw new InvalidOperationException("Can't reconfigure WbTstr after first initialization. Change settings manually.");
+                throw new InvalidOperationException("Can't reconfigure WbTstr once started. Change settings manually.");
             }
 
             lock (_mutex)
             {
                 if (_instance == null)
                 {
-                    _instance = new WbTstr(Guid.NewGuid());
+                    _instance = new WbTstr();
                     if (loadFromConfig)
                     {
                         _instance.SetWebDriverConfig(WbTstrWebDriverConfigs.LoadFromConfigurationFile());
@@ -74,18 +82,6 @@ namespace FluentAutomation
             return _instance;
         }
 
-        /* Properties -------------------------------------------------------*/
-
-        internal Dictionary<string, object> Capabilities
-        {
-            get
-            {
-                return _capabilities.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            }
-        }
-
-        internal Uri RemoteDriverUri { get; private set; }
-
         /*-------------------------------------------------------------------*/
 
         public IWbTstr Start()
@@ -93,132 +89,77 @@ namespace FluentAutomation
             return BootstrapInstance();
         }
 
+        public IWbTstr EnableDebug()
+        {
+            FluentSettings.Current.InDebugMode = true;
+            return this;
+        }
+
+        public IWbTstr DisableDebug()
+        {
+            FluentSettings.Current.InDebugMode = false;
+            return this;
+        }
+
         public IWbTstr EnableDryRun()
         {
-            FluentSettings.Current.IsDryRun = true;
+            FluentSettings.Current.InDryRunMode = true;
             return this;
         }
 
         public IWbTstr DisableDryRun()
         {
-            FluentSettings.Current.IsDryRun = false;
+            FluentSettings.Current.InDryRunMode = false;
             return this;
-        }
-
-        public IWbTstr SetCapability(string key, string value)
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentException("key is null or empty");
-            if (string.IsNullOrEmpty(value)) throw new ArgumentException("value is null or empty");
-
-            _capabilities[key] = value;
-            return this;
-        }
-
-        public IWbTstr RemoveCapability(string key)
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentException("key is null or empty");
-
-            if (_capabilities.ContainsKey(key))
-            {
-                object removed = null;
-                _capabilities.TryRemove(key, out removed);
-            }
-
-            return this;
-        }
-
-        public IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser)
-        {
-            //DisableBrowserStackLocal();
-
-            RemoteDriverUri = null;
-            _localWebDriver = browser;
-            return this;
-        }
-
-        public IWbTstr UseRemoteWebDriver(string remoteWebDriver)
-        {
-            if (remoteWebDriver == null) throw new ArgumentException("remoteWebDriver");
-
-            RemoteDriverUri = new Uri(remoteWebDriver);
-            return this;
-        }
-
-        public IWbTstrBrowserStackOperatingSystem PreferedBrowserStackOperatingSystem()
-        {
-            return new WbTstrBrowserStackOperatingSystem(this);
-        }
-
-        public IWbTstrBrowserStackScreenResolution PreferedBrowserStackScreenResolution()
-        {
-            return new WbTstrBrowserStackScreenResolution(this);
-        }
-
-        public IWbTstrBrowserStackBrowser PreferedBrowserStackBrowser()
-        {
-            return new WbTstrBrowserStackBrowser(this);
         }
 
         public IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig)
         {
-            var localWebDriverConfig = webDriverConfig as ILocalWebDriverConfig;
-            if (localWebDriverConfig != null)
-            {
-                return SetLocalWebDriverConfig(localWebDriverConfig);
-            }
+            if (webDriverConfig == null) throw new ArgumentNullException("webDriverConfig");
 
-            var remoteWebDriverConfig = webDriverConfig as IRemoteWebDriverConfig;
-            if (remoteWebDriverConfig != null)
-            {
-                return SetRemoteWebDriverConfig(remoteWebDriverConfig);
-            }
-
-            throw new InvalidOperationException("Not a supported WebDriver config.");
-        }
-
-        private IWbTstr SetLocalWebDriverConfig(ILocalWebDriverConfig localWebDriverConfig)
-        {
-            UseWebDriver(localWebDriverConfig.Browser);
-
-            return this;
-        }
-
-        private IWbTstr SetRemoteWebDriverConfig(IRemoteWebDriverConfig remoteWebDriverConfig)
-        {
+            WebDriverConfig = webDriverConfig;
             return this;
         }
 
         private IWbTstr BootstrapInstance()
         {
-            if (FluentSettings.Current.IsDryRun)
+            if (FluentSettings.Current.InDryRunMode)
             {
                 SeleniumWebDriver.DryRunBootstrap();
             }
-            else if (RemoteDriverUri != null)
-            {
-                //if (_browserStackLocalEnabled)
-                //{
-                //    string arguments = BrowserStackLocal.Instance.BuildArguments(_browserStackPassword,
-                //        _browserStackLocalFolder,
-                //        _browserStackOnlyAutomate,
-                //        _browserStackForceLocal,
-                //        _browserStackUseProxy,
-                //        _browserStackProxyHost,
-                //        _browserStackProxyPort,
-                //        _browserStackProxyUser,
-                //        _browserStackProxyPassword);
 
-                //    BrowserStackLocal.Instance.Start(_uniqueIdentifier, arguments);
-                //}
-
-                SeleniumWebDriver.Bootstrap(RemoteDriverUri, Capabilities);
-            }
-            else
+            if (WebDriverConfig == null)
             {
-                SeleniumWebDriver.Bootstrap(_localWebDriver);
+                return this;
             }
+
+            var localWebDriverConfig = WebDriverConfig as ILocalWebDriverConfig;
+            if (localWebDriverConfig != null)
+            {
+                BootstrapWithLocalWebDriver(localWebDriverConfig);
+            }
+
+            var remoteWebDriverConfig = WebDriverConfig as IRemoteWebDriverConfig;
+            if (remoteWebDriverConfig != null)
+            {
+                BootstrapWithRemoteWebDriver(remoteWebDriverConfig);
+            }
+            
+            // Webdriver specific setup
+            WebDriverConfig.Setup();
 
             return this;
+        }
+
+        private void BootstrapWithLocalWebDriver(ILocalWebDriverConfig localWebDriverConfig)
+        {
+            SeleniumWebDriver.Bootstrap(localWebDriverConfig.Browser);
+        }
+
+        private void BootstrapWithRemoteWebDriver(IRemoteWebDriverConfig remoteWebDriverConfig)
+        {
+
+            SeleniumWebDriver.Bootstrap(remoteWebDriverConfig.DriverUri, remoteWebDriverConfig.Capabilities);
         }
 
         /* Destruction ------------------------------------------------------*/
@@ -236,12 +177,13 @@ namespace FluentAutomation
                 if (disposing)
                 {
                     // Dispose any managed objects
-                    // ...
+                    if (WebDriverConfig != null)
+                    {
+                        WebDriverConfig.Dispose();
+                    }
                 }
 
-                // Now disposed of any unmanaged objects
-                BrowserStackLocal.Instance.Stop(_uniqueIdentifier);
-
+                // Dispose any unmanged objects
                 _disposed = true;
             }
         }

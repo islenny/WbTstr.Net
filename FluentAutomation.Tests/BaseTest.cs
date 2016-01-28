@@ -30,23 +30,11 @@ namespace FluentAutomation.Tests
             // Default tests use chrome and load the site
             //FluentAutomation.SeleniumWebDriver.Bootstrap(SeleniumWebDriver.Browser.Chrome); //, SeleniumWebDriver.Browser.InternetExplorer, SeleniumWebDriver.Browser.Firefox);
 
-            // Test browserstack local
-            //WbTstr.Configure()
-            //    .EnableDebug()
-            //    .UseBrowserStackAsRemoteDriver()
-            //    .SetBrowserStackBuildIdentifier(buildResultKey)
-            //    .EnableBrowserStackLocal()
-            //    .PreferedBrowser().IsChrome()
-            //    .PreferedOperatingSystem().IsWindows()
-            //    .PreferedScreenResolution().IsAny();
-
             var phantom = WbTstrWebDriverConfigs.DefaultPhantomJsWebDriverConfig;
-            var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
-            var config = WbTstrWebDriverConfigs.LoadFromConfigurationFile();
+            phantom.AddOrSetArgument("--ignore-ssl-errors", true);
 
-            WbTstr.Defaults().Start();
-            //WbTstr.Configure().Start();
-            //WbTstr.Configure(phantom).Start();
+            WbTstr.Configure(phantom).Start();
+
 
             FluentSession.DisableStickySession();
             I.Open(SiteUrl);

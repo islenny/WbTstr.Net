@@ -91,6 +91,7 @@
     <Compile Include="WbTstrBrowserStackScreenResolution.cs" />
     <Compile Include="WbTstrWebDriverConfigs.cs" />
     <Compile Include="WebDrivers\RemoteWebDriverConfig.cs" />
+    <Compile Include="WebDriverType.cs" />
     <Compile Include="Wrappers\BrowserStackLocal.cs" />
     <Compile Include="Wrappers\EnhancedRemoteWebDriver.cs" />
     <Compile Include="Wrappers\IEDriver.cs" />

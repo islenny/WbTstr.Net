@@ -8,6 +8,45 @@ namespace FluentAutomation.Interfaces
     public interface IWbTstr
     {
         /// <summary>
+        /// Enable debug, including BrowserStack debug.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr EnableDebug();
+
+        /// <summary>
+        /// Disables debug, including BrowserStack debug.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr DisableDebug();
+
+        /// <summary>
+        /// Enables dryrun mode, might throw exceptions.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr EnableDryRun();
+
+        /// <summary>
+        /// Disables dryrun mode.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr DisableDryRun();
+
+        /// <summary>
+        /// Starts current WbTstr instance.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr Start();
+
+        /// <summary>
+        /// Specifies the web driver config
+        /// </summary>
+        /// <param name="webDriverConfig"></param>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig);
+
+        IWebDriverConfig WebDriverConfig { get; }
+
+        /// <summary>
         /// Use the BrowserStack service as remote driver, requires credentials. 
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
@@ -123,31 +162,6 @@ namespace FluentAutomation.Interfaces
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
         //IWbTstr DisableBrowserStackProxy();
- 
-
-        /// <summary>
-        /// Enable debug, including BrowserStack debug.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        //IWbTstr EnableDebug();
-
-        /// <summary>
-        /// Disables debug, including BrowserStack debug.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        //IWbTstr DisableDebug();
-
-        /// <summary>
-        /// Enables dryrun mode, might throw exceptions.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr EnableDryRun();
-
-        /// <summary>
-        /// Disables dryrun mode.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableDryRun();
 
         /// <summary>
         /// Sets a custom capability.
@@ -155,21 +169,21 @@ namespace FluentAutomation.Interfaces
         /// <param name="key">Capability key</param>
         /// <param name="value">Capability value</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetCapability(string key, string value);
+        //IWbTstr SetCapability(string key, string value);
 
         /// <summary>
         /// Removes a custom capability.
         /// </summary>
         /// <param name="key">Capability key</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr RemoveCapability(string key);
+        //IWbTstr RemoveCapability(string key);
 
         /// <summary>
         /// Specifies the browser to be used as web driver.
         /// </summary>
         /// <param name="browser">Selenium supported browser</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser);
+        //IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser);
 
         /// <summary>
         /// Specifies the prefered operating system (BrowserStack).
@@ -188,25 +202,5 @@ namespace FluentAutomation.Interfaces
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
         //IWbTstrBrowserStackBrowser PreferedBrowserStackBrowser();
-
-        /// <summary>
-        /// Sets a custom remote webdriver uri
-        /// </summary>
-        /// <param name="remoteWebUri">Remote driver uri</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr UseRemoteWebDriver(string remoteWebUri);
-
-        /// <summary>
-        /// Starts current WbTstr instance.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr Start();
-
-        /// <summary>
-        /// Specifies the web driver config
-        /// </summary>
-        /// <param name="webDriverConfig"></param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig);
     }
 }

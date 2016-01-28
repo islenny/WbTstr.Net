@@ -7,5 +7,6 @@ namespace FluentAutomation.Interfaces
 {
     public interface IRemoteWebDriverConfig : IWebDriverConfig
     {
+        Uri DriverUri { get; }
     }
 }

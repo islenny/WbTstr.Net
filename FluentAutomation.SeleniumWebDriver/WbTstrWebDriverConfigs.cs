@@ -1,9 +1,10 @@
-﻿using FluentAutomation.Interfaces;
-using FluentAutomation.WebDrivers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using FluentAutomation.Interfaces;
+using FluentAutomation.WebDrivers;
 
 namespace FluentAutomation
 {
@@ -68,7 +69,7 @@ namespace FluentAutomation
 
         private static ILocalWebDriverConfig GetDefaultWebDriver(SeleniumWebDriver.Browser browser)
         {
-            switch(browser)
+            switch (browser)
             {
                 case SeleniumWebDriver.Browser.Chrome:
                     return DefaultChromeWebDriverConfig;

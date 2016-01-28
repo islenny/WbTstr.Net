@@ -4,61 +4,62 @@ using System.Linq;
 using System.Text;
 
 using FluentAutomation.Interfaces;
+using FluentAutomation.WebDrivers;
 
 namespace FluentAutomation
 {
     public class WbTstrBrowserStackBrowser : IWbTstrBrowserStackBrowser
     {
-        private readonly IWbTstr _wbTstr;
+        private readonly BrowserStackWebDriverConfig _browserStack;
 
-        public WbTstrBrowserStackBrowser(IWbTstr wbTstr)
+        public WbTstrBrowserStackBrowser(BrowserStackWebDriverConfig browserStack)
         {
-            _wbTstr = wbTstr;
+            _browserStack = browserStack;
         }
 
         /*-------------------------------------------------------------------*/
 
-        public IWbTstr IsAny()
+        public BrowserStackWebDriverConfig IsAny()
         {
-            _wbTstr.RemoveCapability("browser");
-            _wbTstr.RemoveCapability("browser_version");
+            _browserStack.RemoveCapability("browser");
+            _browserStack.RemoveCapability("browser_version");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr IsChrome(string version = null)
+        public BrowserStackWebDriverConfig IsChrome(string version = null)
         {
-            _wbTstr.SetCapability("browser", "Chrome");
+            _browserStack.AddOrSetCapability("browser", "Chrome");
             SetBrowserVersion(version);
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr IsInternetExplorer(string version = null)
+        public BrowserStackWebDriverConfig IsInternetExplorer(string version = null)
         {
-            _wbTstr.SetCapability("browser", "IE");
+            _browserStack.AddOrSetCapability("browser", "IE");
             SetBrowserVersion(version);
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr IsFirefox(string version = null)
+        public BrowserStackWebDriverConfig IsFirefox(string version = null)
         {
-            _wbTstr.SetCapability("browser", "Firefox");
+            _browserStack.AddOrSetCapability("browser", "Firefox");
             SetBrowserVersion(version);
-            
-            return _wbTstr;
+
+            return _browserStack;
         }
 
         private void SetBrowserVersion(string version)
         {
             if (version != null)
             {
-                _wbTstr.SetCapability("browser_version", version);
+                _browserStack.AddOrSetCapability("browser_version", version);
             }
             else
             {
-                _wbTstr.RemoveCapability("browser_version");
+                _browserStack.RemoveCapability("browser_version");
             }
         }
     }

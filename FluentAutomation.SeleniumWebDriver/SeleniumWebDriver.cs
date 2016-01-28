@@ -5,6 +5,7 @@ using FluentAutomation.Interfaces;
 using FluentAutomation.Wrappers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
@@ -227,7 +228,10 @@ namespace FluentAutomation
 
         private static Func<IWebDriver> GenerateBrowserSpecificDriver(Browser browser, TimeSpan commandTimeout)
         {
+            var webDriverConfig = (ILocalWebDriverConfig)WbTstr.Instance.WebDriverConfig;
+
             string driverPath = string.Empty;
+            string driverFile = string.Empty;
             switch (browser)
             {
                 case Browser.InternetExplorer:
@@ -250,18 +254,20 @@ namespace FluentAutomation
                     //Providing an unique name for the chromedriver makes it possible to run multiple instances
                     var uniqueName = string.Format("chromedriver_{0}.exe", Guid.NewGuid());
                     driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", uniqueName, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
-                    var chromeService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath),
-                        uniqueName);
+                    var chromeService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), uniqueName);
                     chromeService.SuppressInitialDiagnosticInformation = true;
                     var chromeOptions = new ChromeOptions();
                     chromeOptions.AddArgument("--log-level=3");
 
-                    return new Func<IWebDriver>(() => new OpenQA.Selenium.Chrome.ChromeDriver(chromeService, chromeOptions, commandTimeout));
+                    return () => new ChromeDriver(chromeService, chromeOptions, commandTimeout);
                 case Browser.PhantomJs:
-                    driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+                    driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("phantomjs_{0}.exe", Guid.NewGuid()) : "phantomjs.exe";
+                    driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
 
-                    var phantomOptions = new OpenQA.Selenium.PhantomJS.PhantomJSOptions();
-                    return new Func<IWebDriver>(() => new OpenQA.Selenium.PhantomJS.PhantomJSDriver(Path.GetDirectoryName(driverPath), phantomOptions, commandTimeout));
+                    var phantomJsDriverService = PhantomJSDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
+                    phantomJsDriverService.AddArguments(webDriverConfig.Arguments);
+
+                    return () => new PhantomJSDriver(phantomJsDriverService);
             }
 
             throw new NotImplementedException("Selected browser " + browser.ToString() + " is not supported yet.");
