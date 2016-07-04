@@ -158,7 +158,6 @@ namespace FluentAutomation
 
         private void BootstrapWithRemoteWebDriver(IRemoteWebDriverConfig remoteWebDriverConfig)
         {
-
             SeleniumWebDriver.Bootstrap(remoteWebDriverConfig.DriverUri, remoteWebDriverConfig.Capabilities);
         }
 

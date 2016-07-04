@@ -9,6 +9,8 @@ namespace FluentAutomation.Interfaces
     {
         WebDriverType WebDriverType { get; }
 
+        Guid UniqueIdentifier { get; }
+
         Dictionary<string, object> Capabilities { get; } 
      
         void AddOrSetCapability(string key, string value);

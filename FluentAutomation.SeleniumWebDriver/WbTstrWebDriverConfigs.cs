@@ -28,7 +28,7 @@ namespace FluentAutomation
             }
         }
 
-        public static IRemoteWebDriverConfig DefaultBrowserStackWebDriverConfig
+        public static IBrowserStackWebDriverConfig DefaultBrowserStackWebDriverConfig
         {
             get
             {

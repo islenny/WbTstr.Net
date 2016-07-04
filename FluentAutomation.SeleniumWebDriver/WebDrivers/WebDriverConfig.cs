@@ -15,9 +15,12 @@ namespace FluentAutomation.WebDrivers
         protected WebDriverConfig()
         {
             _capabilities = new Dictionary<string, string>();
+            UniqueIdentifier = Guid.NewGuid();
         }
 
         /*-------------------------------------------------------------------*/
+
+        public Guid UniqueIdentifier { get; protected set; }
 
         public WebDriverType WebDriverType { get; protected set; }
 

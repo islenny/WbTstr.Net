@@ -33,8 +33,16 @@ namespace FluentAutomation.Tests
             var phantom = WbTstrWebDriverConfigs.DefaultPhantomJsWebDriverConfig;
             phantom.AddOrSetArgument("--ignore-ssl-errors", true);
 
-            WbTstr.Configure(phantom).Start();
+            var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
 
+            var browserstack = WbTstrWebDriverConfigs.DefaultBrowserStackWebDriverConfig;
+            browserstack.EnableBrowserStackLocal();
+            browserstack.SetBrowserStackCredentials(ConfigReader.GetSetting("BrowserStackUsername"), ConfigReader.GetSetting("BrowserStackPassword"));
+
+            WbTstr.Configure(browserstack).Start();
+
+            FluentSettings.Current.WindowHeight = 1080;
+            FluentSettings.Current.WindowWidth = 1920;
 
             FluentSession.DisableStickySession();
             I.Open(SiteUrl);

@@ -252,7 +252,7 @@ namespace FluentAutomation
                     });
                 case Browser.Chrome:
                     driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("chromedriver_{0}.exe", Guid.NewGuid()) : "chromedriver.exe";
-                    driverPath = EmbeddedResources.UnpackFromAssembly("chromediver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+                    driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
 
                     var chromeDriverService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
                     chromeDriverService.SuppressInitialDiagnosticInformation = true;

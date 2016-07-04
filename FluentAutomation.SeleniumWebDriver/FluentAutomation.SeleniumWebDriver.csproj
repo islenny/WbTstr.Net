@@ -65,6 +65,7 @@
     <Compile Include="..\FluentAutomation\Properties\AssemblyGlobal.cs">
       <Link>Properties\AssemblyGlobal.cs</Link>
     </Compile>
+    <Compile Include="Interfaces\IBrowserStackWebDriverConfig.cs" />
     <Compile Include="Interfaces\ILocalWebDriverConfig.cs" />
     <Compile Include="Interfaces\IRemoteWebDriverConfig.cs" />
     <Compile Include="WebDrivers\BrowserStackWebDriverConfig.cs" />

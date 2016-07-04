@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using FluentAutomation.Wrappers;
+
 namespace FluentAutomation.WebDrivers
 {
-    public class BrowserStackWebDriverConfig : RemoteWebDriverConfig
+    public class BrowserStackWebDriverConfig : RemoteWebDriverConfig, IBrowserStackWebDriverConfig
     {
         private string _browserStackUsername;
         private string _browserStackPassword;
         private bool _browserStackLocalEnabled;
-        private bool _browserStackUseProxy;
         private string _browserStackLocalFolder;
         private bool _browserStackOnlyAutomate;
         private bool _browserStackForceLocal;
@@ -19,9 +20,12 @@ namespace FluentAutomation.WebDrivers
         private int? _browserStackProxyPort;
         private string _browserStackProxyUser;
         private string _browserStackProxyPassword;
+        private bool _browserStackLocalKillOthers;
+        private bool _browserStackLocalRestrictToLocalOnly;
 
         public BrowserStackWebDriverConfig()
         {
+            DriverUri = new Uri("http://hub.browserstack.com/wd/hub/");
         }
 
         public BrowserStackWebDriverConfig SetBrowserStackLocalFolder(string path)
@@ -62,53 +66,49 @@ namespace FluentAutomation.WebDrivers
 
         public BrowserStackWebDriverConfig SetBrowserStackProxyHost(string host)
         {
-            _browserStackUseProxy = true;
             _browserStackProxyHost = host;
             return this;
         }
 
         public BrowserStackWebDriverConfig SetBrowserStackProxyPort(int port)
         {
-            _browserStackUseProxy = true;
             _browserStackProxyPort = port;
             return this;
         }
 
         public BrowserStackWebDriverConfig SetBrowserStackProxyUser(string user)
         {
-            _browserStackUseProxy = true;
             _browserStackProxyUser = user;
             return this;
         }
 
         public BrowserStackWebDriverConfig SetBrowserStackProxyPassword(string password)
         {
-            _browserStackUseProxy = true;
             _browserStackProxyPassword = password;
             return this;
         }
 
-        public BrowserStackWebDriverConfig DisableBrowserStackProxy()
+        public BrowserStackWebDriverConfig EnableBrowserStackLocalKillOthers()
         {
-            _browserStackUseProxy = false;
+            _browserStackLocalKillOthers = true;
             return this;
         }
 
-        public BrowserStackWebDriverConfig UseBrowserStackAsRemoteDriver()
+        public BrowserStackWebDriverConfig DisableBrowserStackLocalKillOthers()
         {
-            //UseRemoteWebDriver("http://hub.browserstack.com/wd/hub/");
+            _browserStackLocalKillOthers = false;
+            return this;
+        }
 
-            // Try to get browserstack username and password from configuration
-            if (_browserStackUsername == null && _browserStackPassword == null)
-            {
-                string username = ConfigReader.GetSetting("BrowserStackUsername");
-                string password = ConfigReader.GetSetting("BrowserStackPassword");
+        public BrowserStackWebDriverConfig EnableBrowserStackLocalRestrictToLocalOnly()
+        {
+            _browserStackLocalRestrictToLocalOnly = true;
+            return this;
+        }
 
-                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
-                {
-                    SetBrowserStackCredentials(username, password);
-                }
-            }
+        public BrowserStackWebDriverConfig DisableBrowserStackLocalRestrictToLocalOnly()
+        {
+            _browserStackLocalRestrictToLocalOnly = false;
             return this;
         }
 
@@ -175,6 +175,32 @@ namespace FluentAutomation.WebDrivers
             FluentSettings.Current.InDebugMode = false;
             AddOrSetCapability("browserstack.debug", "false");
             return this;
+        }
+
+        /*-------------------------------------------------------------------*/
+
+        public override void Setup()
+        {
+            base.Setup();
+            
+            if (_browserStackLocalEnabled)
+            {
+                // start browserstack with arguments
+                string browserStackArguments = BrowserStackLocal.Instance.BuildArguments(
+                    _browserStackPassword,                           
+                    _browserStackLocalFolder,
+                    _browserStackOnlyAutomate,
+                    _browserStackForceLocal,
+                    _browserStackProxyHost,
+                    _browserStackProxyPort,
+                    _browserStackProxyUser,
+                    _browserStackProxyPassword,
+                    _browserStackLocalKillOthers,
+                    _browserStackLocalRestrictToLocalOnly
+                );
+                
+                BrowserStackLocal.Instance.Start(UniqueIdentifier, browserStackArguments);
+            }
         }
     }
 }
