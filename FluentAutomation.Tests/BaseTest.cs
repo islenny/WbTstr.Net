@@ -24,9 +24,7 @@ namespace FluentAutomation.Tests
 
             var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
 
-            var firefox = WbTstrWebDriverConfigs.DefaultFirefoxWebDriverConfig;
-
-            WbTstr.Configure(firefox).Start();
+            WbTstr.Configure(chrome).Start();
         }
 
         public BaseTest()
