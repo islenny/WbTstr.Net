@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using OpenQA.Selenium.Firefox;
 using Polly;
 
 using TinyIoC;
@@ -240,16 +240,20 @@ namespace FluentAutomation
                 case Browser.InternetExplorer64:
                     driverPath = EmbeddedResources.UnpackFromAssembly("IEDriverServer64.exe", "IEDriverServer.exe", Assembly.GetAssembly(typeof(SeleniumWebDriver)));
                     return new Func<IWebDriver>(() => new Wrappers.IEDriverWrapper(Path.GetDirectoryName(driverPath), commandTimeout));
+
                 case Browser.Firefox:
-                    return new Func<IWebDriver>(() => {
-                        var firefoxBinary = new OpenQA.Selenium.Firefox.FirefoxBinary();
-                        return new OpenQA.Selenium.Firefox.FirefoxDriver(firefoxBinary, new OpenQA.Selenium.Firefox.FirefoxProfile
-                        {
-                            EnableNativeEvents = false,
-                            AcceptUntrustedCertificates = true,
-                            AlwaysLoadNoFocusLibrary = true
-                        }, commandTimeout);
-                    });
+                    driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("geckodriver_{0}.exe", Guid.NewGuid()) : "geckodriver.exe";
+                    driverPath = EmbeddedResources.UnpackFromAssembly("geckodriver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+
+                    var firefoxDriverService = FirefoxDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
+                    firefoxDriverService.SuppressInitialDiagnosticInformation = true;
+
+                    var firefoxOptions = new FirefoxOptions();
+                    firefoxOptions.AddArguments(webDriverConfig.Arguments);
+
+
+                    return () => new FirefoxDriver(firefoxDriverService, firefoxOptions, commandTimeout);
+
                 case Browser.Chrome:
                     driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("chromedriver_{0}.exe", Guid.NewGuid()) : "chromedriver.exe";
                     driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
@@ -261,6 +265,7 @@ namespace FluentAutomation
                     chromeOptions.AddArguments(webDriverConfig.Arguments);
 
                     return () => new ChromeDriver(chromeDriverService, chromeOptions, commandTimeout);
+
                 case Browser.PhantomJs:
                     driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("phantomjs_{0}.exe", Guid.NewGuid()) : "phantomjs.exe";
                     driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
@@ -271,7 +276,7 @@ namespace FluentAutomation
 
                     var phantomJSOptions = new PhantomJSOptions();
 
-                    return () => new PhantomJSDriver(phantomJsDriverService, phantomJSOptions);
+                    return () => new PhantomJSDriver(phantomJsDriverService, phantomJSOptions, commandTimeout);
             }
 
             throw new NotImplementedException("Selected browser " + browser + " is not supported yet.");

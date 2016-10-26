@@ -80,6 +80,7 @@
     <Compile Include="Interfaces\IWebDriverConfig.cs" />
     <Compile Include="MultiCommandProvider.cs" />
     <Compile Include="MultiAssertProvider.cs" />
+    <Compile Include="WebDrivers\FirefoxWebDriverConfig.cs" />
     <Compile Include="WebDrivers\WebDriverConfig.cs" />
     <Compile Include="WebDrivers\LocalWebDriverConfig.cs" />
     <Compile Include="WebDrivers\InternetExplorerWebDriverConfig.cs" />
@@ -115,6 +116,9 @@
     <EmbeddedResource Include="3rdPartyLib\IEDriverServer32.exe" />
     <EmbeddedResource Include="3rdPartyLib\IEDriverServer64.exe" />
     <EmbeddedResource Include="3rdPartyLib\phantomjs.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="3rdPartyLib\geckodriver.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

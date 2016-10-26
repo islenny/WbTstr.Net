@@ -36,6 +36,14 @@ namespace FluentAutomation
             }
         }
 
+        public static ILocalWebDriverConfig DefaultFirefoxWebDriverConfig
+        {
+            get
+            {
+                return new FirefoxWebDriverConfig();
+            }
+        }
+
         public static IWebDriverConfig LoadFromConfigurationFile()
         {
             IWebDriverConfig webDriverConfig = null;
@@ -75,6 +83,8 @@ namespace FluentAutomation
                     return DefaultChromeWebDriverConfig;
                 case SeleniumWebDriver.Browser.PhantomJs:
                     return DefaultPhantomJsWebDriverConfig;
+                case SeleniumWebDriver.Browser.Firefox:
+                    return DefaultFirefoxWebDriverConfig;
             }
 
             throw new NotSupportedException("The specified browser isn't supported.");
