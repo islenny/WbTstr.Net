@@ -12,7 +12,7 @@ namespace FluentAutomation
     {
         private const string SettingValue_UseWebDriver_BrowserStack = "BROWSERSTACK";
 
-        public static ILocalWebDriverConfig DefaultChromeWebDriverConfig
+        public static ChromeWebDriverConfig DefaultChromeWebDriverConfig
         {
             get
             {
@@ -20,11 +20,19 @@ namespace FluentAutomation
             }
         }
 
-        public static ILocalWebDriverConfig DefaultPhantomJsWebDriverConfig
+        public static PhantomWebDriverConfig DefaultPhantomJsWebDriverConfig
         {
             get
             {
                 return new PhantomWebDriverConfig();
+            }
+        }
+
+        public static FirefoxWebDriverConfig DefaultFirefoxWebDriverConfig
+        {
+            get
+            {
+                return new FirefoxWebDriverConfig();
             }
         }
 
@@ -33,14 +41,6 @@ namespace FluentAutomation
             get
             {
                 return new BrowserStackWebDriverConfig();
-            }
-        }
-
-        public static ILocalWebDriverConfig DefaultFirefoxWebDriverConfig
-        {
-            get
-            {
-                return new FirefoxWebDriverConfig();
             }
         }
 

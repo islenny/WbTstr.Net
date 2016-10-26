@@ -11,5 +11,11 @@ namespace FluentAutomation.WebDrivers
         {
             Browser = SeleniumWebDriver.Browser.PhantomJs;
         }
+
+        /*-------------------------------------------------------------------*/
+
+        public string ProxyHost { get; set; }
+        
+        public string ProxyAuthentication { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FluentAutomation.WebDrivers;
 using OpenQA.Selenium.Firefox;
 using Polly;
 
@@ -267,12 +268,29 @@ namespace FluentAutomation
                     return () => new ChromeDriver(chromeDriverService, chromeOptions, commandTimeout);
 
                 case Browser.PhantomJs:
+                    var phantomWebDriverConfig = (PhantomWebDriverConfig) webDriverConfig;
+
                     driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("phantomjs_{0}.exe", Guid.NewGuid()) : "phantomjs.exe";
                     driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
 
                     var phantomJsDriverService = PhantomJSDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
                     phantomJsDriverService.AddArguments(webDriverConfig.Arguments);
                     phantomJsDriverService.IgnoreSslErrors = true;
+
+
+                    string proxyHost = phantomWebDriverConfig.ProxyHost;
+                    if (!string.IsNullOrWhiteSpace(proxyHost))
+                    {
+                        phantomJsDriverService.Proxy = proxyHost;
+                        phantomJsDriverService.ProxyType = "http";
+
+                        string proxyAuthentication = phantomWebDriverConfig.ProxyAuthentication;
+                        if (!string.IsNullOrWhiteSpace(proxyAuthentication))
+                        {
+                            phantomJsDriverService.ProxyAuthentication = proxyAuthentication;
+                        }
+                    }
+
 
                     var phantomJSOptions = new PhantomJSOptions();
 
