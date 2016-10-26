@@ -24,7 +24,7 @@ namespace FluentAutomation.Tests
 
             var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
 
-            WbTstr.Configure(chrome).Start();
+            WbTstr.Configure(phantom).Start();
         }
 
         public BaseTest()
