@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FluentAutomation.Tests;
+using FluentAutomation.Tests.Pages;
 using Xunit;
 
 namespace FluentAutomation.Tests
@@ -14,6 +16,17 @@ namespace FluentAutomation.Tests
     /// </summary>
     public class BaseTest : FluentTest<IWebDriver>
     {
+        static BaseTest()
+        {
+            // Default tests use chrome and load the site
+            var phantom = WbTstrWebDriverConfigs.DefaultPhantomJsWebDriverConfig;
+            phantom.AddOrSetArgument("--ignore-ssl-errors", true);
+
+            var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
+
+            WbTstr.Configure(chrome).Start();
+        }
+
         public BaseTest()
         {
             FluentSession.EnableStickySession();
@@ -27,24 +40,10 @@ namespace FluentAutomation.Tests
             this.DragPage = new Pages.DragPage(this);
             this.SwitchPage = new Pages.SwitchPage(this);
 
-            // Default tests use chrome and load the site
-            //FluentAutomation.SeleniumWebDriver.Bootstrap(SeleniumWebDriver.Browser.Chrome); //, SeleniumWebDriver.Browser.InternetExplorer, SeleniumWebDriver.Browser.Firefox);
-
-            var phantom = WbTstrWebDriverConfigs.DefaultPhantomJsWebDriverConfig;
-            phantom.AddOrSetArgument("--ignore-ssl-errors", true);
-
-            var chrome = WbTstrWebDriverConfigs.DefaultChromeWebDriverConfig;
-
-            var browserstack = WbTstrWebDriverConfigs.DefaultBrowserStackWebDriverConfig;
-            browserstack.EnableBrowserStackLocal();
-            browserstack.SetBrowserStackCredentials(ConfigReader.GetSetting("BrowserStackUsername"), ConfigReader.GetSetting("BrowserStackPassword"));
-
-            WbTstr.Configure(browserstack).Start();
-
             FluentSettings.Current.WindowHeight = 1080;
             FluentSettings.Current.WindowWidth = 1920;
 
-            FluentSession.DisableStickySession();
+            //FluentSession.DisableStickySession();
             I.Open(SiteUrl);
         }
 

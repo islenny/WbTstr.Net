@@ -9,7 +9,7 @@ namespace FluentAutomation.Tests.Check
 {
     public class CheckTextTests : BaseTest
     {
-        public CheckTextTests() : base()
+        public CheckTextTests()
         {
             AlertsPage.Go();
         }
