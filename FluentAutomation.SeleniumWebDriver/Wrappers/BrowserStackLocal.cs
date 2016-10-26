@@ -13,7 +13,7 @@ namespace FluentAutomation.Wrappers
     public class BrowserStackLocal : IDisposable
     {
         private const string MutexName = "{e8aa150b-3b92-44c8-a9d4-aecfb6c51416}";
-        private static object _mutex = string.Empty;
+        private static readonly object _mutex = new object();
         private static bool _disposed;
         private static BrowserStackLocal _instance;
         private Dictionary<string, Process> _processes;
@@ -49,15 +49,16 @@ namespace FluentAutomation.Wrappers
 
         /*-------------------------------------------------------------------*/
 
-        public string BuildArguments(string browserStackKey, 
-                                     string browserStackLocalFolder, 
-                                     bool browserStackOnlyAutomate, 
-                                     bool browserStackForceLocal, 
-                                     bool browserStackUseProxy,
-                                     string browserStackProxyHost, 
-                                     int? browserStackProxyPort, 
-                                     string browserStackProxyUser, 
-                                     string browserStackProxyPassword)
+        public string BuildArguments(string browserStackKey = null, 
+                                     string browserStackLocalFolder = null, 
+                                     bool? browserStackOnlyAutomate = null, 
+                                     bool? browserStackForceLocal = null, 
+                                     string browserStackProxyHost = null, 
+                                     int? browserStackProxyPort = null, 
+                                     string browserStackProxyUser = null, 
+                                     string browserStackProxyPassword = null,
+                                     bool? forceKillRunningInstancse = null,
+                                     bool? restrictLocalTestingOnly = null)
         {
             string arguments = string.Empty;
 
@@ -75,27 +76,32 @@ namespace FluentAutomation.Wrappers
                 arguments += string.Format(" -f {0}", browserStackLocalFolder);
             }
 
-            if (browserStackOnlyAutomate)
+            if (forceKillRunningInstancse.HasValue && forceKillRunningInstancse.Value)
             {
-                arguments += " -onlyAutomate";
+                arguments += " -force";
             }
 
-            if (browserStackForceLocal)
+            if (restrictLocalTestingOnly.HasValue && restrictLocalTestingOnly.Value)
+            {
+                arguments += " -only";
+            }
+
+            if (browserStackForceLocal.HasValue && browserStackForceLocal.Value)
             {
                 arguments += " -forcelocal";
             }
 
-            if (!browserStackUseProxy)
+            if (browserStackOnlyAutomate.HasValue && browserStackOnlyAutomate.Value)
             {
-                return arguments;
+                arguments += " -onlyAutomate";
             }
 
-            if (string.IsNullOrWhiteSpace(browserStackProxyHost))
+            if (!string.IsNullOrWhiteSpace(browserStackProxyHost))
             {
                 arguments += string.Format(" -proxyHost {0}", browserStackProxyHost); 
             }
 
-            if (browserStackProxyPort != null )
+            if (browserStackProxyPort != null)
             {
                 arguments += string.Format(" -proxyPort {0}", browserStackProxyPort);
             }
@@ -113,15 +119,16 @@ namespace FluentAutomation.Wrappers
             return arguments;
         }
 
-        public bool Start(string identifier, string arguments)
+        public bool Start(Guid identifier, string arguments)
         {
+            string strIdentifier = identifier.ToString();
             using (var mutex = new Mutex(false, MutexName))
             {
                 mutex.WaitOne();
 
                 try
                 {
-                    if (IsBrowserStackLocalProcessRunning(identifier))
+                    if (IsBrowserStackLocalProcessRunning(strIdentifier))
                     {
                         Console.WriteLine("BrowserStackLocal ({0}) is already running!", identifier);
                         return false;
@@ -129,21 +136,21 @@ namespace FluentAutomation.Wrappers
 
                     Console.WriteLine("Starting BrowserStackLocal ({0})!", identifier);
                     Process process;
-                    if (_processes.TryGetValue(identifier, out process))
+                    if (_processes.TryGetValue(strIdentifier, out process))
                     {
                         // Restart stored process
                         process.Start();
                     }
                     else
                     {
-                        string targetExeFilename = ConvertToBrowserStackLocalTargetFilename(identifier);
+                        string targetExeFilename = ConvertToBrowserStackLocalTargetFilename(strIdentifier);
                         string fullPathToExe = EmbeddedResources.UnpackFromAssembly(
                             "BrowserStackLocal.exe",
                             targetExeFilename,
                             Assembly.GetAssembly(typeof(SeleniumWebDriver)));
 
                         // Start a new process
-                        var processStartInfo = GetProcessStartInfo(fullPathToExe, identifier, arguments);
+                        var processStartInfo = GetProcessStartInfo(fullPathToExe, strIdentifier, arguments);
                         process = Process.Start(processStartInfo);
 
                         if (process != null)
@@ -161,7 +168,7 @@ namespace FluentAutomation.Wrappers
                         process.Refresh();
                         if (!process.HasExited)
                         {
-                            _processes[identifier] = process;
+                            _processes[strIdentifier] = process;
                             return true;
                         }
                     }

@@ -106,11 +106,12 @@ namespace FluentAutomation
                 try
                 {
                     // Get the remote WebDriver configuration
-                    WbTstr wbTstr = WbTstr.Configure() as WbTstr;
-                    if (wbTstr != null)
+                    IWbTstr wbTstr = WbTstr.Instance;
+                    IWebDriverConfig webDriverConfig = wbTstr.WebDriverConfig;
+                    if (webDriverConfig != null && webDriverConfig.WebDriverType != WebDriverType.Local)
                     {
-                        var capabilities = new DesiredCapabilities(wbTstr.Capabilities);
-                        var remoteDriverUri = wbTstr.RemoteDriverUri;
+                        var capabilities = new DesiredCapabilities(webDriverConfig.Capabilities);
+                        var remoteDriverUri = ((IRemoteWebDriverConfig)webDriverConfig).DriverUri;
 
                         // Create a new remote WebDriver
                         var policy = Policy.Handle<Exception>().WaitAndRetry(4, i => TimeSpan.FromSeconds(30));
@@ -468,7 +469,7 @@ namespace FluentAutomation
             {
                 var unwrappedElement = element.Element as Element;
 
-                ((IJavaScriptExecutor)this._webDriver).ExecuteScript(string.Format("if (typeof fluentjQuery != 'undefined') {{ fluentjQuery(\"{0}\").val(\"{1}\").trigger('change'); }}", unwrappedElement.Selector.Replace("\"", ""), text.Replace("\"", "")));
+                ((IJavaScriptExecutor)this._webDriver).ExecuteScript(string.Format("if (typeof Sizzle != 'undefined') {{ var el = Sizzle(\"{0}\")[0]; el.value = \"{1}\"; el.dispatchEvent(new Event('change')); }}", unwrappedElement.Selector.Replace("\"", ""), text.Replace("\"", "")));
             });
         }
 
@@ -486,7 +487,7 @@ namespace FluentAutomation
             this.Act(CommandType.Action, () =>
             {
                 var unwrappedElement = element.Element as Element;
-                ((IJavaScriptExecutor)this._webDriver).ExecuteScript(string.Format("if (typeof fluentjQuery != 'undefined') {{ fluentjQuery(\"{0}\").val(fluentjQuery(\"{0}\").val() + \"{1}\").trigger('change'); }}", unwrappedElement.Selector.Replace("\"", ""), text.Replace("\"", "")));
+                ((IJavaScriptExecutor)this._webDriver).ExecuteScript(string.Format("if (typeof Sizzle != 'undefined') {{ var el = Sizzle(\"{0}\")[0]; el.value = el.value + \"{1}\"; el.dispatchEvent(new Event('change')); }}", unwrappedElement.Selector.Replace("\"", ""), text.Replace("\"", "")));
             });
         }
 
@@ -776,7 +777,8 @@ namespace FluentAutomation
         {
             this.Act(CommandType.Action, () =>
             {
-                var propertyValue = ((IJavaScriptExecutor)this._webDriver).ExecuteScript(string.Format("return fluentjQuery(\"{0}\").css(\"{1}\")", element.Element.Selector, propertyName));
+                string javascript = string.Format("return (window.getComputedStyle ? getComputedStyle(Sizzle(\"{0}\")[0], null) : Sizzle(\"{0}\")[0].currentStyle)[\"{1}\"];", element.Element.Selector, propertyName);
+                var propertyValue = ((IJavaScriptExecutor)this._webDriver).ExecuteScript(javascript);
                 if (propertyValue == null)
                     action(false, string.Empty);
                 else

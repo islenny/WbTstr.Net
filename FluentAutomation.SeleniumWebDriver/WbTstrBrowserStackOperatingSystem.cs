@@ -4,53 +4,54 @@ using System.Linq;
 using System.Text;
 
 using FluentAutomation.Interfaces;
+using FluentAutomation.WebDrivers;
 
 namespace FluentAutomation
 {
     public class WbTstrBrowserStackOperatingSystem : IWbTstrBrowserStackOperatingSystem
     {
-        private readonly IWbTstr _wbTstr;
+        private readonly BrowserStackWebDriverConfig _browserStack;
 
-        public WbTstrBrowserStackOperatingSystem(IWbTstr wbTstr)
+        public WbTstrBrowserStackOperatingSystem(BrowserStackWebDriverConfig browserStack)
         {
-            _wbTstr = wbTstr;
+            _browserStack = browserStack;
         }
 
         /*-------------------------------------------------------------------*/
 
-        public IWbTstr IsAny()
+        public BrowserStackWebDriverConfig IsAny()
         {
-            _wbTstr.RemoveCapability("os");
-            _wbTstr.RemoveCapability("os_version");
+            _browserStack.RemoveCapability("os");
+            _browserStack.RemoveCapability("os_version");
 
-            return _wbTstr;
-        }
-       
-        public IWbTstr IsWindows(string version = null)
-        {
-            _wbTstr.SetCapability("os", "Windows");
-            SetOperatingSystemVersion(version);
-
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr IsOSX(string version = null)
+        public BrowserStackWebDriverConfig IsWindows(string version = null)
         {
-            _wbTstr.SetCapability("os", "OS X");
+            _browserStack.AddOrSetCapability("os", "Windows");
             SetOperatingSystemVersion(version);
 
-            return _wbTstr;
+            return _browserStack;
+        }
+
+        public BrowserStackWebDriverConfig IsOSX(string version = null)
+        {
+            _browserStack.AddOrSetCapability("os", "OS X");
+            SetOperatingSystemVersion(version);
+
+            return _browserStack;
         }
 
         private void SetOperatingSystemVersion(string version)
         {
             if (version != null)
             {
-                _wbTstr.SetCapability("os_version", version);
+                _browserStack.AddOrSetCapability("os_version", version);
             }
             else
             {
-                _wbTstr.RemoveCapability("os_version");
+                _browserStack.RemoveCapability("os_version");
             }
         }
     }

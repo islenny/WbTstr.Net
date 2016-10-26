@@ -35,7 +35,7 @@ namespace FluentAutomation
         {
             get
             {
-                return FluentSettings.Current.IsDryRun;
+                return FluentSettings.Current.InDryRunMode;
             }
         }
 

@@ -8,142 +8,6 @@ namespace FluentAutomation.Interfaces
     public interface IWbTstr
     {
         /// <summary>
-        /// Use the BrowserStack service as remote driver, requires credentials. 
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr UseBrowserStackAsRemoteDriver();
-
-        /// <summary>
-        /// Sets the credentials for the BrowserStack service. 
-        /// </summary>
-        /// <param name="username">BrowserStack username</param>
-        /// <param name="password">BrowserStack password</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackCredentials(string username, string password);
-
-        /// <summary>
-        /// Enables the automatic startup of BrowserStackLocal (VPN).
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr EnableBrowserStackLocal();
-
-        /// <summary>
-        /// Disables the automatic startup of BrowserStackLocal (VPN).
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackLocal();
-
-        /// <summary>
-        /// Enables grouping of tests in BrowserStack.
-        /// </summary>
-        /// <param name="projectName">Name of the project</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr EnableBrowserStackProjectGrouping(string projectName);
-
-        /// <summary>
-        /// Disables grouping of tests in BrowserStack.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackProjectGrouping();
-
-        /// <summary>
-        /// Marks the tests of a run with a unique build identifier.
-        /// </summary>
-        /// <param name="buildName">Build identifier</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackBuildIdentifier(string buildName);
-
-        /// <summary>
-        /// Allow BrowserStack to access a local folder
-        /// </summary>
-        /// <param name="path">Path to local folder</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackLocalFolder(string path);
-
-        /// <summary>
-        /// Disable BrowserStack access a local folder
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackLocalFolder();
-
-        /// <summary>
-        /// Set BrowserStack local testing connection to only automate
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr EnableBrowserStackOnlyAutomate();
-
-        /// <summary>
-        /// Disable BrowserStack local connection for only automate
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackOnlyAutomate();
-
-        /// <summary>
-        /// Set BrowserStack local testing to force local
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr EnableBrowserStackForceLocal();
-
-        /// <summary>
-        /// Disable BrowserStack local connection to be forced local
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackForceLocal();
-
-        /// <summary>
-        /// Set BrowserStack local testing proxy host
-        /// </summary>
-        /// <param name="host">proxy hostname</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackProxyHost(string host);
-
-        /// <summary>
-        /// Set BrowserStack local testing proxy port
-        /// </summary>
-        /// <param name="port">proxy port</param>
-        /// <returns></returns>
-        IWbTstr SetBrowserStackProxyPort(int port);
-
-        /// <summary>
-        /// Set BrowserStack local testing proxy user
-        /// </summary>
-        /// <param name="user">proxy username</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackProxyUser(string user);
-
-        /// <summary>
-        /// Set BrowserStack local testing proxy password
-        /// </summary>
-        /// <param name="password">proxy password</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetBrowserStackProxyPassword(string password);
-
-        /// <summary>
-        /// Set the proxy host for PhantomJs (e.g. address or address:port)
-        /// </summary>
-        /// <param name="host">address of the proxy (optionally with port)</param>
-        /// <returns></returns>
-        IWbTstr SetPhantomProxyHost(string host);
-
-        string GetPhantomProxyHost();
-
-        /// <summary>
-        /// Set the proxy authentication for PhantomJs (e.g. username:password)
-        /// </summary>
-        /// <param name="authentication">Username and password for proxy</param>
-        /// <returns></returns>
-        IWbTstr SetPhantomProxyAuthentication(string authentication);
-
-        string GetPhantomProxyAuthentication();
-
-        /// <summary>
-        /// Disable BrowserStack local testing proxy
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr DisableBrowserStackProxy();
- 
-
-        /// <summary>
         /// Enable debug, including BrowserStack debug.
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
@@ -168,56 +32,193 @@ namespace FluentAutomation.Interfaces
         IWbTstr DisableDryRun();
 
         /// <summary>
+        /// Starts current WbTstr instance.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr Start();
+
+        /// <summary>
+        /// Specifies the web driver config
+        /// </summary>
+        /// <param name="webDriverConfig"></param>
+        /// <returns>Current WbTstr instance</returns>
+        IWbTstr SetWebDriverConfig(IWebDriverConfig webDriverConfig);
+
+        IWebDriverConfig WebDriverConfig { get; }
+
+        /// <summary>
+        /// Use the BrowserStack service as remote driver, requires credentials. 
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr UseBrowserStackAsRemoteDriver();
+
+        /// <summary>
+        /// Sets the credentials for the BrowserStack service. 
+        /// </summary>
+        /// <param name="username">BrowserStack username</param>
+        /// <param name="password">BrowserStack password</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackCredentials(string username, string password);
+
+        /// <summary>
+        /// Enables the automatic startup of BrowserStackLocal (VPN).
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr EnableBrowserStackLocal();
+
+        /// <summary>
+        /// Disables the automatic startup of BrowserStackLocal (VPN).
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackLocal();
+
+        /// <summary>
+        /// Enables grouping of tests in BrowserStack.
+        /// </summary>
+        /// <param name="projectName">Name of the project</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr EnableBrowserStackProjectGrouping(string projectName);
+
+        /// <summary>
+        /// Disables grouping of tests in BrowserStack.
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackProjectGrouping();
+
+        /// <summary>
+        /// Marks the tests of a run with a unique build identifier.
+        /// </summary>
+        /// <param name="buildName">Build identifier</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackBuildIdentifier(string buildName);
+
+        /// <summary>
+        /// Allow BrowserStack to access a local folder
+        /// </summary>
+        /// <param name="path">Path to local folder</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackLocalFolder(string path);
+
+        /// <summary>
+        /// Disable BrowserStack access a local folder
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackLocalFolder();
+
+        /// <summary>
+        /// Set BrowserStack local testing connection to only automate
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr EnableBrowserStackOnlyAutomate();
+
+        /// <summary>
+        /// Disable BrowserStack local connection for only automate
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackOnlyAutomate();
+
+        /// <summary>
+        /// Set BrowserStack local testing to force local
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr EnableBrowserStackForceLocal();
+
+        /// <summary>
+        /// Disable BrowserStack local connection to be forced local
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackForceLocal();
+
+        /// <summary>
+        /// Set BrowserStack local testing proxy host
+        /// </summary>
+        /// <param name="host">proxy hostname</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackProxyHost(string host);
+
+        /// <summary>
+        /// Set BrowserStack local testing proxy port
+        /// </summary>
+        /// <param name="port">proxy port</param>
+        /// <returns></returns>
+        //IWbTstr SetBrowserStackProxyPort(int port);
+
+        /// <summary>
+        /// Set BrowserStack local testing proxy user
+        /// </summary>
+        /// <param name="user">proxy username</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackProxyUser(string user);
+
+        /// <summary>
+        /// Set BrowserStack local testing proxy password
+        /// </summary>
+        /// <param name="password">proxy password</param>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr SetBrowserStackProxyPassword(string password);
+
+        /// <summary>
+        /// Set the proxy host for PhantomJs (e.g. address or address:port)
+        /// </summary>
+        /// <param name="host">address of the proxy (optionally with port)</param>
+        /// <returns></returns>
+        IWbTstr SetPhantomProxyHost(string host);
+
+        string GetPhantomProxyHost();
+
+        /// <summary>
+        /// Set the proxy authentication for PhantomJs (e.g. username:password)
+        /// </summary>
+        /// <param name="authentication">Username and password for proxy</param>
+        /// <returns></returns>
+        IWbTstr SetPhantomProxyAuthentication(string authentication);
+
+        string GetPhantomProxyAuthentication();
+
+        /// <summary>
+        /// Disable BrowserStack local testing proxy
+        /// </summary>
+        /// <returns>Current WbTstr instance</returns>
+        //IWbTstr DisableBrowserStackProxy();
+
+        /// <summary>
         /// Sets a custom capability.
         /// </summary>
         /// <param name="key">Capability key</param>
         /// <param name="value">Capability value</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr SetCapability(string key, string value);
+        //IWbTstr SetCapability(string key, string value);
 
         /// <summary>
         /// Removes a custom capability.
         /// </summary>
         /// <param name="key">Capability key</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr RemoveCapability(string key);
+        //IWbTstr RemoveCapability(string key);
 
         /// <summary>
         /// Specifies the browser to be used as web driver.
         /// </summary>
         /// <param name="browser">Selenium supported browser</param>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser);
+        //IWbTstr UseWebDriver(SeleniumWebDriver.Browser browser);
 
         /// <summary>
         /// Specifies the prefered operating system (BrowserStack).
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstrBrowserStackOperatingSystem PreferedBrowserStackOperatingSystem();
+        //IWbTstrBrowserStackOperatingSystem PreferedBrowserStackOperatingSystem();
 
         /// <summary>
         /// Specifies the prefered screen resolution (BrowserStack). 
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstrBrowserStackScreenResolution PreferedBrowserStackScreenResolution();
+        //IWbTstrBrowserStackScreenResolution PreferedBrowserStackScreenResolution();
 
         /// <summary>
         /// Specifies the prefered browser (BrowserStack).
         /// </summary>
         /// <returns>Current WbTstr instance</returns>
-        IWbTstrBrowserStackBrowser PreferedBrowserStackBrowser();
-
-        /// <summary>
-        /// Sets a custom remote webdriver uri
-        /// </summary>
-        /// <param name="remoteWebUri">Remote driver uri</param>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr UseRemoteWebDriver(string remoteWebUri);
-
-        /// <summary>
-        /// Boostraps current WbTstr instance.
-        /// </summary>
-        /// <returns>Current WbTstr instance</returns>
-        IWbTstr BootstrapInstance();
+        //IWbTstrBrowserStackBrowser PreferedBrowserStackBrowser();
     }
 }

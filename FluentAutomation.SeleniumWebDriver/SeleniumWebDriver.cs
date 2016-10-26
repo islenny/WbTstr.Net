@@ -5,17 +5,17 @@ using FluentAutomation.Interfaces;
 using FluentAutomation.Wrappers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using OpenQA.Selenium.Firefox;
 using Polly;
 
 using TinyIoC;
-using OpenQA.Selenium.PhantomJS;
 
 namespace FluentAutomation
 {
@@ -228,7 +228,10 @@ namespace FluentAutomation
 
         private static Func<IWebDriver> GenerateBrowserSpecificDriver(Browser browser, TimeSpan commandTimeout)
         {
-            string driverPath = string.Empty;
+            var webDriverConfig = (ILocalWebDriverConfig)WbTstr.Instance.WebDriverConfig;
+
+            string driverPath;
+            string driverFile;
             switch (browser)
             {
                 case Browser.InternetExplorer:
@@ -237,50 +240,46 @@ namespace FluentAutomation
                 case Browser.InternetExplorer64:
                     driverPath = EmbeddedResources.UnpackFromAssembly("IEDriverServer64.exe", "IEDriverServer.exe", Assembly.GetAssembly(typeof(SeleniumWebDriver)));
                     return new Func<IWebDriver>(() => new Wrappers.IEDriverWrapper(Path.GetDirectoryName(driverPath), commandTimeout));
+
                 case Browser.Firefox:
-                    return new Func<IWebDriver>(() => {
-                        var firefoxBinary = new OpenQA.Selenium.Firefox.FirefoxBinary();
-                        return new OpenQA.Selenium.Firefox.FirefoxDriver(firefoxBinary, new OpenQA.Selenium.Firefox.FirefoxProfile
-                        {
-                            EnableNativeEvents = false,
-                            AcceptUntrustedCertificates = true,
-                            AlwaysLoadNoFocusLibrary = true
-                        }, commandTimeout);
-                    });
+                    driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("geckodriver_{0}.exe", Guid.NewGuid()) : "geckodriver.exe";
+                    driverPath = EmbeddedResources.UnpackFromAssembly("geckodriver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+
+                    var firefoxDriverService = FirefoxDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
+                    firefoxDriverService.SuppressInitialDiagnosticInformation = true;
+
+                    var firefoxOptions = new FirefoxOptions();
+                    firefoxOptions.AddArguments(webDriverConfig.Arguments);
+
+
+                    return () => new FirefoxDriver(firefoxDriverService, firefoxOptions, commandTimeout);
+
                 case Browser.Chrome:
-                    //Providing an unique name for the chromedriver makes it possible to run multiple instances
-                    var uniqueName = string.Format("chromedriver_{0}.exe", Guid.NewGuid());
-                    driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", uniqueName, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
-                    var chromeService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath),
-                        uniqueName);
-                    chromeService.SuppressInitialDiagnosticInformation = true;
+                    driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("chromedriver_{0}.exe", Guid.NewGuid()) : "chromedriver.exe";
+                    driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+
+                    var chromeDriverService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
+                    chromeDriverService.SuppressInitialDiagnosticInformation = true;
+
                     var chromeOptions = new ChromeOptions();
-                    chromeOptions.AddArgument("--log-level=3");
+                    chromeOptions.AddArguments(webDriverConfig.Arguments);
 
-                    return new Func<IWebDriver>(() => new OpenQA.Selenium.Chrome.ChromeDriver(chromeService, chromeOptions, commandTimeout));
+                    return () => new ChromeDriver(chromeDriverService, chromeOptions, commandTimeout);
+
                 case Browser.PhantomJs:
-                    var uniqueNamePhantom = string.Format("phantomjs_{0}.exe", Guid.NewGuid());
-                    driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", uniqueNamePhantom, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
-                    var phantomService = PhantomJSDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), uniqueNamePhantom);
+                    driverFile = webDriverConfig.GenerateUniqueExecutableFilename ? string.Format("phantomjs_{0}.exe", Guid.NewGuid()) : "phantomjs.exe";
+                    driverPath = EmbeddedResources.UnpackFromAssembly("phantomjs.exe", driverFile, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
 
-                    IWbTstr config = WbTstr.Configure();
-                    string proxyHost = config.GetPhantomProxyHost();
-                    if (!string.IsNullOrWhiteSpace(proxyHost))
-                    {
-                        phantomService.Proxy = proxyHost;
-                        phantomService.ProxyType = "http";
+                    var phantomJsDriverService = PhantomJSDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath), driverFile);
+                    phantomJsDriverService.AddArguments(webDriverConfig.Arguments);
+                    phantomJsDriverService.IgnoreSslErrors = true;
 
-                        string proxyAuthentication = config.GetPhantomProxyAuthentication();
-                        if (!string.IsNullOrWhiteSpace(proxyAuthentication))
-                        {
-                            phantomService.ProxyAuthentication = proxyAuthentication;
-                        }
-                    }
+                    var phantomJSOptions = new PhantomJSOptions();
 
-                    return new Func<IWebDriver>(() => new PhantomJSDriver(phantomService, new PhantomJSOptions(), commandTimeout));
+                    return () => new PhantomJSDriver(phantomJsDriverService, phantomJSOptions, commandTimeout);
             }
 
-            throw new NotImplementedException("Selected browser " + browser.ToString() + " is not supported yet.");
+            throw new NotImplementedException("Selected browser " + browser + " is not supported yet.");
         }
 
         private static DesiredCapabilities GenerateDesiredCapabilities(Browser browser)

@@ -144,7 +144,7 @@ namespace FluentAutomation
 
         public bool InDebugMode { get; set; }
 
-        public bool IsDryRun { get; set; }
+        public bool InDryRunMode { get; set; }
 
         public bool Disposed { get; private set; }
 

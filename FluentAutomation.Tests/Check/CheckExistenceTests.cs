@@ -24,6 +24,7 @@ namespace FluentAutomation.Tests.Check
             bool CheckNotExistingElement = I.Check.Exist(".container > h3");
 
             // Assert
+            I.TakeScreenshot("Test2");
             Assert.True(CheckExistingElement);
             Assert.False(CheckNotExistingElement);
         }

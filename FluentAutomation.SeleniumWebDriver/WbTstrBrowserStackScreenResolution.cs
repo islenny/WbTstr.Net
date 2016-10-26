@@ -4,95 +4,96 @@ using System.Linq;
 using System.Text;
 
 using FluentAutomation.Interfaces;
+using FluentAutomation.WebDrivers;
 
 namespace FluentAutomation
 {
     public class WbTstrBrowserStackScreenResolution : IWbTstrBrowserStackScreenResolution
     {
-        private readonly IWbTstr _wbTstr;
+        private readonly BrowserStackWebDriverConfig _browserStack;
 
-        public WbTstrBrowserStackScreenResolution(IWbTstr wbTstr)
+        public WbTstrBrowserStackScreenResolution(BrowserStackWebDriverConfig browserStack)
         {
-            _wbTstr = wbTstr;
+            _browserStack = browserStack;
         }
 
         /*-------------------------------------------------------------------*/
 
-        public IWbTstr IsAny()
+        public BrowserStackWebDriverConfig IsAny()
         {
-            _wbTstr.RemoveCapability("resolution");
+            _browserStack.RemoveCapability("resolution");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1024x768()
+        public BrowserStackWebDriverConfig Is1024x768()
         {
-            _wbTstr.SetCapability("resolution", "1024x768");
+            _browserStack.AddOrSetCapability("resolution", "1024x768");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1280x800()
+        public BrowserStackWebDriverConfig Is1280x800()
         {
-            _wbTstr.SetCapability("resolution", "1280x800");
+            _browserStack.AddOrSetCapability("resolution", "1280x800");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1280x1024()
+        public BrowserStackWebDriverConfig Is1280x1024()
         {
-            _wbTstr.SetCapability("resolution", "1280x1024");
+            _browserStack.AddOrSetCapability("resolution", "1280x1024");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1366x768()
+        public BrowserStackWebDriverConfig Is1366x768()
         {
-            _wbTstr.SetCapability("resolution", "1366x768");
+            _browserStack.AddOrSetCapability("resolution", "1366x768");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1440x900()
+        public BrowserStackWebDriverConfig Is1440x900()
         {
-            _wbTstr.SetCapability("resolution", "1440x900");
+            _browserStack.AddOrSetCapability("resolution", "1440x900");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1680x1050()
+        public BrowserStackWebDriverConfig Is1680x1050()
         {
-            _wbTstr.SetCapability("resolution", "1680x1050");
+            _browserStack.AddOrSetCapability("resolution", "1680x1050");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1600x1200()
+        public BrowserStackWebDriverConfig Is1600x1200()
         {
-            _wbTstr.SetCapability("resolution", "1600x1200");
+            _browserStack.AddOrSetCapability("resolution", "1600x1200");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1920x1200()
+        public BrowserStackWebDriverConfig Is1920x1200()
         {
-            _wbTstr.SetCapability("resolution", "1920x1200");
+            _browserStack.AddOrSetCapability("resolution", "1920x1200");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is1920x1080()
+        public BrowserStackWebDriverConfig Is1920x1080()
         {
-            _wbTstr.SetCapability("resolution", "1920x1080");
+            _browserStack.AddOrSetCapability("resolution", "1920x1080");
 
-            return _wbTstr;
+            return _browserStack;
         }
 
-        public IWbTstr Is2048x1536()
+        public BrowserStackWebDriverConfig Is2048x1536()
         {
-            _wbTstr.SetCapability("resolution", "2048x1536");
+            _browserStack.AddOrSetCapability("resolution", "2048x1536");
 
-            return _wbTstr;
+            return _browserStack;
         }
     }
 }
