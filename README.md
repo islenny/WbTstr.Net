@@ -2,20 +2,20 @@
 
 ## Overview
 <!-- start -->
-WbTstr.Net is a tool which makes testing the web easy. It's based on Selenium Webdriver but with an much easier syntax.
-It allows teams to focus on Test Automation whith as little hassle as possible. 
+WbTstr.Net is a tool which makes testing the web easy. It's based on Selenium WebDriver but with an much easier syntax.
+It allows teams to focus on Test Automation with as little hassle as possible. 
 
 <!-- end -->
 
 
 <!-- start -->
 ## Background
-We believe that Test Automation is a team efford. So coding your tests is the only right way of doing it.
+We believe that Test Automation is a team effort. So coding your tests is the only right way of doing it.
 But we don't want to be distracted by syntax or timings. That's why we started WbTstr.Net, based on
 [FluentAutomation](http://fluent.stirno.com).
 
 WbTstr.Net is a simple tool which let you create your tests in a fluent syntax within minutes.
-We built it on top of Webdriver which allows you to test in all major browsers.
+We built it on top of WebDriver which allows you to test in all major browsers.
 
 So let's get started [here](/guide.html)
  
@@ -25,7 +25,8 @@ So let's get started [here](/guide.html)
 <!-- start -->
 ## Contributors
 
-WbTstr.Net is an open source project by [Mirabeau](https://www.mirabeau.nl)
+WbTstr.Net is an open source project by [Mirabeau](https://www.mirabeau.nl).
+
 We have the following contributors (A-Z):
 * Maarten Groeneweg
 * Onno Valkering
@@ -37,7 +38,7 @@ We have the following contributors (A-Z):
 
 ### Install
 There are 2 ways of installing WbTstr.Net. 
-Unless you would like a specific project structure we advice to start with the Visual Studio extension.
+Unless you would like a specific project structure we advise to start with the Visual Studio extension.
 
 #### Use the Visual Studio extension
 The quickest way of getting started with WbTstr.Net is by using the Visual Studio extension.
@@ -161,9 +162,9 @@ To combat this, it can be useful to use `PageObject` to group your actions/expec
 
 With the new first-class `PageObject` support, we provide some simple but useful built-in functions such as `Go` and `Switch`. Also included, a validation function tied to the `this.At` property.
 
-Any time a `PageObject` navigation is triggered, or any time `Switch` is used, the included `At` functino will execute providing an easy hook to make sure all tests execute with the underlying browser and application in the same state, every time.
+Any time a `PageObject` navigation is triggered, or any time `Switch` is used, the included `At` function will execute providing an easy hook to make sure all tests execute with the underlying browser and application in the same state, every time.
 
-If you have any ideas for or comments on the new <code>PageObject</code> functionality, let us know! Its a new feature and we'd love some feedback.
+If you have any ideas for or comments on the new <code>PageObject</code> functionality, let us know! It's a new feature and we'd love some feedback.
 
 
 ```csharp
