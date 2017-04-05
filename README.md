@@ -485,7 +485,7 @@ Important Note: Most actions have implicit WaitUntil functionality built-in. Bef
 
 ```csharp
 // WaitUntil element exists
-I.WaitUntil(() => I.Assert.Exists("#searchBar")));
+I.WaitUntil(() => I.Assert.Exists("#searchBar"));
 
 // WaitUntil element has attribute 'data-loaded'
 I.WaitUntil(() =>
