@@ -4,6 +4,7 @@
 *.orig
 
 #Visual Studio files
+.vs/
 *.testsettings
 *.[Oo]bj
 *.user
