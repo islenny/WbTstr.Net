@@ -1,3 +1,5 @@
+__DEPRECATED__ in favor of WbTstr ([wbtstr/wbtstr](https://github.com/wbtstr/wbtstr)).
+
 # WbTstr.Net
 
 ## Overview
