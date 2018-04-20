@@ -89,7 +89,7 @@ namespace FluentAutomation
         {
             Bootstrap(Browser.Firefox);
         }
-        
+
         /// <summary>
         /// Bootstrap Selenium provider and utilize the specified <paramref name="browser"/>.
         /// </summary>
@@ -113,7 +113,7 @@ namespace FluentAutomation
                 container.Register<IWebDriver>((c, o) => browserDriver());
             };
         }
-        
+
         public static void Bootstrap(params Browser[] browsers)
         {
             Bootstrap(DefaultCommandTimeout, browsers);
@@ -145,7 +145,7 @@ namespace FluentAutomation
                 container.Register<ILogger, ConsoleLogger>();
             };
         }
-        
+
         /// <summary>
         /// Bootstrap Selenium provider using a Remote web driver targeting the requested browser
         /// </summary>
@@ -172,7 +172,7 @@ namespace FluentAutomation
                 container.Register<IWebDriver, RemoteWebDriver>(CreateEnhancedRemoteWebDriver(driverUri, browserCapabilities, commandTimeout));
             };
         }
-        
+
         /// <summary>
         /// Bootstrap Selenium provider using a Remote web driver service with the requested capabilities
         /// </summary>
@@ -204,7 +204,7 @@ namespace FluentAutomation
                 container.Register<IWebDriver, RemoteWebDriver>(CreateEnhancedRemoteWebDriver(driverUri, browserCapabilities, commandTimeout));
             };
         }
-        
+
         public static void Bootstrap(Uri driverUri, Dictionary<string, object> capabilities)
         {
             Bootstrap(driverUri, capabilities, DefaultCommandTimeout);
@@ -250,9 +250,22 @@ namespace FluentAutomation
                 case Browser.Chrome:
                     //Providing an unique name for the chromedriver makes it possible to run multiple instances
                     var uniqueName = string.Format("chromedriver_{0}.exe", Guid.NewGuid());
-                    driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", uniqueName, Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+                    var chromeDriverPath = ConfigReader.GetSetting("ChromeDriverPath");
+                    if (!string.IsNullOrEmpty(chromeDriverPath))
+                    {
+                        driverPath = chromeDriverPath;
+                        uniqueName = "chromedriver.exe";
+                    }
+                    else
+                    {
+
+                        driverPath = EmbeddedResources.UnpackFromAssembly("chromedriver.exe", uniqueName,
+                            Assembly.GetAssembly(typeof(SeleniumWebDriver)));
+                    }
+
                     var chromeService = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(driverPath),
                         uniqueName);
+
                     chromeService.SuppressInitialDiagnosticInformation = true;
                     var chromeOptions = new ChromeOptions();
                     chromeOptions.AddArgument("--log-level=3");
@@ -329,7 +342,7 @@ namespace FluentAutomation
             container.Register<ILogger, ConsoleLogger>();
             container.Register<ICommandProvider, CommandProvider>();
             container.Register<IAssertProvider, AssertProvider>();
-            container.Register<IFileStoreProvider, LocalFileStoreProvider>();            
+            container.Register<IFileStoreProvider, LocalFileStoreProvider>();
         }
 
         internal static EnhancedRemoteWebDriver CreateEnhancedRemoteWebDriver(Uri driverUri, DesiredCapabilities browserCapabilities, TimeSpan commandTimeout)
@@ -342,7 +355,7 @@ namespace FluentAutomation
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to create a enhanced RemoteWebDriver. Retried {0} times.", NumberOfRetries);           
+                Console.WriteLine("Failed to create a enhanced RemoteWebDriver. Retried {0} times.", NumberOfRetries);
                 throw;
             }
         }
